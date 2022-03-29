@@ -1,6 +1,11 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"io/ioutil"
+	"os"
+	"strings"
+)
 
 // Create a new type, called 'deck', which is a slice of strings
 // Now, any other file in this same package can use the type deck
@@ -31,4 +36,28 @@ func (d deck) print(){
 
 func deal(d deck, handSize int) (deck, deck){
 	return d[:handSize], d[handSize:]
+}
+
+func (d deck) toString() string {
+	return strings.Join([]string(d), ",")
+}
+
+func newDeckFromFile(filename string) deck {
+	// bs is short for byte slice
+	bs, err := ioutil.ReadFile(filename)
+	if err != nil {
+		// Option #1 - log the error and return a call to newDeck() so that it returns a deck
+		// Option #2 - log the error and entirely quit the program
+		// We're going with option #2
+
+		fmt.Println("Error:", err)
+		os.Exit(1)			// a non-zero here indicates that there was an error
+	}
+
+	// string(bs)		// converts the byte slice into a 
+					// becomes: Ace of Spades,Two of Spades,Three of Spades...
+
+	s := strings.Split(string(bs), ",")
+	return deck(s)		// deck(s)  turns the slice of strings into a deck
+
 }
