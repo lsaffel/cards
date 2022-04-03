@@ -40,8 +40,14 @@ func deal(d deck, handSize int) (deck, deck){
 	return d[:handSize], d[handSize:]
 }
 
+// takes a deck and converts it into a string separated by commas
 func (d deck) toString() string {
 	return strings.Join([]string(d), ",")
+}
+
+func (d deck) saveToFile(filename string) error {
+	return ioutil.WriteFile(filename, []byte(d.toString()), 0666)
+	// 0666 is the permissions. It means that anyone can read and write this file
 }
 
 func newDeckFromFile(filename string) deck {
@@ -56,7 +62,7 @@ func newDeckFromFile(filename string) deck {
 		os.Exit(1)			// a non-zero here indicates that there was an error
 	}
 
-	// string(bs)		// converts the byte slice into a 
+	// string(bs)		// converts the byte slice into a string
 					// becomes: Ace of Spades,Two of Spades,Three of Spades...
 
 	s := strings.Split(string(bs), ",")
@@ -71,10 +77,9 @@ func (d deck) shuffle() {
 	source := rand.NewSource(time.Now().UnixNano())
 	r := rand.New(source)
 
-	for i := range d{
+	for i := range d {
 		// newPosition := rand.Intn(len(d) - 1)
 		newPosition := r.Intn(len(d) - 1)
-
 
 		// this swaps the elements at these two positions
 		d[i], d[newPosition] = d[newPosition], d[i]
